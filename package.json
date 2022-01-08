@@ -11,9 +11,11 @@
     "dev": "yarn build && yarn start"
   },
   "dependencies": {
+    "@types/bn.js": "^5.1.0",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/node": "^17.0.8",
+    "bn.js": "^5.2.0",
     "chalk": "4.1.2",
     "cors": "^2.8.5",
     "date-fns": "^2.28.0",
@@ -21,7 +23,7 @@
     "express": "^4.17.2",
     "mongodb": "^4.3.0",
     "teslabot": "^1.4.1",
-    "ton": "^6.5.0",
+    "ton": "^6.5.1",
     "ton-crypto": "^1.7.0",
     "typescript": "^4.5.4"
   }

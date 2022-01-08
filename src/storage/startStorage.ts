@@ -1,5 +1,6 @@
+import { BN } from "bn.js";
 import { MongoClient, Db, Collection } from "mongodb";
-import { Address } from "ton";
+import { Address, Cell, parseTransaction } from "ton";
 import { log } from "../utils/log";
 
 export const storage = new MongoClient(process.env.STORAGE!);
@@ -61,6 +62,41 @@ export async function applyTransactions(transactions: { address: Address, lt: st
             upsert: true
         }
     })));
+}
+
+export async function getTransactions(address: Address, lt: string, limit: number): Promise<{ end: boolean, items: { lt: string, hash: string, data: string }[] }> {
+    let ex = await transactionsCollection.find({ address: address.toFriendly(), lt: { $lte: parseInt(lt, 10) } }, { limit }).toArray();
+
+    // Nothing found
+    if (ex.length === 0) {
+        return { end: false, items: [] };
+    }
+
+    // First transaction is not target
+    if (ex[0].lt !== parseInt(lt, 10)) {
+        return { end: false, items: [] };
+    }
+
+    // Check continuity of transactions
+    let res: { lt: string, hash: string, data: string }[] = [];
+    res.push({ lt: ex[0].lt.toString(), hash: ex[0].hash, data: ex[0].data });
+    let t = parseTransaction(address.workChain, Cell.fromBoc(Buffer.from(ex[0].data, 'base64'))[0].beginParse());
+    let prevTx = t.prevTransaction;
+    let reachedEnd = false;
+    for (let i = 1; i < ex.length; i++) {
+        let t = parseTransaction(address.workChain, Cell.fromBoc(Buffer.from(ex[i].data, 'base64'))[0].beginParse());
+        if (!t.lt.eq(prevTx.lt)) {
+            break;
+        }
+        res.push({ lt: ex[i].lt.toString(), hash: ex[i].hash, data: ex[i].data });
+        prevTx = t.prevTransaction;
+        if (prevTx.lt.eq(new BN(0))) {
+            reachedEnd = true;
+            break;
+        }
+    }
+
+    return { end: reachedEnd, items: res };
 }
 
 export async function startStorage() {
