@@ -3,6 +3,7 @@ import { warn } from "../../utils/log";
 import { Address } from "ton";
 import { backoff } from "../../utils/time";
 import { getClient, ingress } from "../../ton/ingress";
+import { applyTransactions } from '../../storage/startStorage';
 
 export function handleGetTransactions(): express.RequestHandler {
     return async (req, res) => {
@@ -34,7 +35,11 @@ export function handleGetTransactions(): express.RequestHandler {
             // Fetch from generic clients
             let client = getClient(ingress.clients);
             let txs = await client.getTransactions(address, { limit, lt, hash, inclusive: false });
-            let existing = txs.find((v) => v.id.lt === lt && Buffer.from(v.id.hash, 'base64').equals(Buffer.from(hash, 'base64')));
+            if (txs.length > 0) {
+                await applyTransactions(txs.map((v) => ({ address: address, lt: v.id.lt, hash: v.id.hash, data: v.data })));
+            }
+
+            let existing = txs.find((v) => v.id.lt === lt);
             if (existing) {
                 // Found in generic clients
                 res.status(200).send({
@@ -50,7 +55,10 @@ export function handleGetTransactions(): express.RequestHandler {
             // Fetch from historic clients
             let historic = getClient([ingress.historical]);
             txs = await historic.getTransactions(address, { limit, lt, hash, inclusive: true });
-            existing = txs.find((v) => v.id.lt === lt && Buffer.from(v.id.hash, 'base64').equals(Buffer.from(hash, 'base64')));
+            if (txs.length > 0) {
+                await applyTransactions(txs.map((v) => ({ address: address, lt: v.id.lt, hash: v.id.hash, data: v.data })));
+            }
+            existing = txs.find((v) => v.id.lt === lt);
             if (existing) {
                 // Found in historical clients
                 res.status(200).send({

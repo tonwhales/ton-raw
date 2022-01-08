@@ -1,4 +1,5 @@
 import { MongoClient, Db, Collection } from "mongodb";
+import { Address } from "ton";
 import { log } from "../utils/log";
 
 export const storage = new MongoClient(process.env.STORAGE!);
@@ -6,10 +7,10 @@ export const storage = new MongoClient(process.env.STORAGE!);
 let db: Db;
 let syncStates: Collection;
 let blocksCollection: Collection;
+let transactionsCollection: Collection;
 
 export async function getSyncState(key: string) {
     let ex = await syncStates.findOne({ _id: key });
-    console.warn('getSyncState(' + key + '): ' + (ex ? ex.value : null));
     if (ex) {
         return ex.value as string;
     } else {
@@ -52,6 +53,16 @@ export async function getBlock(seq: number) {
     }
 }
 
+export async function applyTransactions(transactions: { address: Address, lt: string, hash: string, data: string }[]) {
+    await transactionsCollection.bulkWrite(transactions.map((v) => ({
+        updateOne: {
+            filter: { address: v.address.toFriendly(), lt: parseInt(v.lt, 10) },
+            update: { $set: { address: v.address.toFriendly(), lt: parseInt(v.lt, 10), hash: v.hash, data: v.data } },
+            upsert: true
+        }
+    })));
+}
+
 export async function startStorage() {
     log('Connecting to MongoDB');
     await storage.connect();
@@ -60,6 +71,7 @@ export async function startStorage() {
     db = storage.db();
     syncStates = db.collection('sync_state');
     blocksCollection = db.collection('blocks');
+    transactionsCollection = db.collection('transactions');
 
     log('Connected');
 }
