@@ -19,6 +19,8 @@ spec:
           image: image:v2
           env:
             - name: PORT
-              value: 3000
+              value: "3000"
           ports:
             - containerPort: 3000
+          imagePullSecrets:
+            - name: regcred
