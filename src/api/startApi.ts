@@ -5,6 +5,7 @@ import { handleGetAccount } from './handlers/handleGetAccount';
 import { handleGetBlock } from './handlers/handleGetBlock';
 import { handleGetBlockLatest } from './handlers/handleGetBlockLatest';
 import { handleGetStatus } from './handlers/handleGetStatus';
+import { handleGetTransactions } from './handlers/handleGetTransactions';
 export async function startApi() {
 
     // Configure
@@ -19,6 +20,7 @@ export async function startApi() {
     app.get('/address/:address', handleGetAccount());
     app.get('/block/latest', handleGetBlockLatest());
     app.get('/block/:seqno', handleGetBlock());
+    app.get('/tx/:address', handleGetTransactions());
     app.get('/status', handleGetStatus());
 
     // Start
