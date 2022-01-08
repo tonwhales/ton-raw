@@ -55,7 +55,19 @@ export async function getBlock(seq: number) {
     }
 }
 
-export async function applyAccounts(accounts: { address: string }[]) {
+export async function applyAccounts(accounts: {
+    address: string,
+    balance: string,
+    code: string | null,
+    data: string | null,
+    state: 'active' | 'uninitialized' | 'frozen',
+    lastTransaction: {
+        lt: string,
+        hash: string
+    } | null,
+    timestamp: number,
+    syncSeqno: number
+}[]) {
 
     // Insert new
     await addressCollection.bulkWrite(accounts.map((v) => ({
@@ -78,6 +90,27 @@ export async function applyAccounts(accounts: { address: string }[]) {
             upsert: false
         }
     })));
+}
+
+export async function getAccount(address: Address) {
+    let ex = await addressCollection.findOne({ _id: address.toFriendly() });
+    if (ex) {
+        return (ex as any) as {
+            address: string,
+            balance: string,
+            code: string | null,
+            data: string | null,
+            state: 'active' | 'uninitialized' | 'frozen',
+            lastTransaction: {
+                lt: string,
+                hash: string
+            } | null,
+            timestamp: number,
+            syncSeqno: number
+        };
+    } else {
+        return null;
+    }
 }
 
 export async function applyTransactions(transactions: { address: Address, lt: string, hash: string, data: string }[]) {
