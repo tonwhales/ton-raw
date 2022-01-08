@@ -22,33 +22,49 @@ export function handleGetTransactions(): express.RequestHandler {
                 res.status(400).send('400 Bad Request');
                 return;
             }
+
+            let lt = req.query.lt;
+            let hash = req.query.hash;
             let limit = parseInt(req.query.limit);
             if (limit < 10 || limit > 100) {
                 res.status(400).send('400 Bad Request');
                 return;
             }
 
-            // Fetch state
-            // let rawState = await backoff(async () => {
-            //     return getClient(ingress.clients).getContractState(address);
-            // });
+            // Fetch from generic clients
+            let client = getClient(ingress.clients);
+            let txs = await client.getTransactions(address, { limit, lt, hash, inclusive: false });
+            let existing = txs.find((v) => v.id.lt === lt && Buffer.from(v.id.hash, 'base64').equals(Buffer.from(hash, 'base64')));
+            if (existing) {
+                // Found in generic clients
+                res.status(200).send({
+                    transactions: txs.map((v) => ({
+                        lt: v.id.lt,
+                        hash: v.id.hash,
+                        data: v.data
+                    }))
+                });
+                return;
+            }
 
-            // // Result
-            // res.status(200)
-            //     .set('Cache-Control', 'public, max-age=5')
-            //     .send({
-            //         address: address.toFriendly(),
-            //         balance: rawState.balance.toString(10),
-            //         state: rawState.state,
-            //         code: rawState.code ? rawState.code.toString('base64') : null,
-            //         data: rawState.data ? rawState.data.toString('base64') : null,
-            //         lastTransaction: rawState.lastTransaction ? {
-            //             lt: rawState.lastTransaction.lt,
-            //             hash: rawState.lastTransaction.hash
-            //         } : null,
-            //         timestamp: rawState.timestampt
-            //     });
+            // Fetch from historic clients
+            let historic = getClient([ingress.historical]);
+            txs = await historic.getTransactions(address, { limit, lt, hash, inclusive: true });
+            existing = txs.find((v) => v.id.lt === lt && Buffer.from(v.id.hash, 'base64').equals(Buffer.from(hash, 'base64')));
+            if (existing) {
+                // Found in historical clients
+                res.status(200).send({
+                    transactions: txs.map((v) => ({
+                        lt: v.id.lt,
+                        hash: v.id.hash,
+                        data: v.data
+                    }))
+                });
+                return;
+            }
 
+            // All storages failed
+            res.status(404).send('404 Not Found');
         } catch (e) {
             warn(e);
             res.status(500).send('500 Internal Error');

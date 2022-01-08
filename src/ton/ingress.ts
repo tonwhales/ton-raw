@@ -8,6 +8,9 @@ if (!process.env.TON_HISTORICAL) {
     throw Error('TON_HISTORICAL is not set');
 }
 
+const historicalEndpoints = process.env.TON_HISTORICAL!.split(',');
+const genericEndpoints = process.env.TON_ENDPOINTS.split(',');
+
 const historical = new TonClient({ endpoint: process.env.TON_HISTORICAL });
 const clients = (process.env.TON_ENDPOINTS.split(',')).map((v) => new TonClient({ endpoint: v }));
 export const ingress = {
