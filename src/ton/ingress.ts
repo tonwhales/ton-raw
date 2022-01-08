@@ -1,4 +1,4 @@
-import { TonClient } from "ton";
+import { Address, TonClient } from "ton";
 import { backoff } from "../utils/time";
 
 if (!process.env.TON_ENDPOINTS) {
@@ -47,4 +47,21 @@ export async function fetchBlock(seqno: number, clients: TonClient[]) {
         }
     }));
     return shards;
+}
+
+export async function fetchAccountState(address: Address) {
+    let rawState = await getClient(ingress.clients).getContractState(address);
+    return ({
+        address: address.toFriendly(),
+        balance: rawState.balance.toString(10),
+        state: rawState.state,
+        code: rawState.code ? rawState.code.toString('base64') : null,
+        data: rawState.data ? rawState.data.toString('base64') : null,
+        lastTransaction: rawState.lastTransaction ? {
+            lt: rawState.lastTransaction.lt,
+            hash: rawState.lastTransaction.hash
+        } : null,
+        timestamp: rawState.timestampt,
+        syncSeqno: rawState.blockId.seqno
+    });
 }

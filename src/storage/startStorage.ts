@@ -9,6 +9,7 @@ let db: Db;
 let syncStates: Collection;
 let blocksCollection: Collection;
 let transactionsCollection: Collection;
+let addressCollection: Collection;
 
 export async function getSyncState(key: string) {
     let ex = await syncStates.findOne({ _id: key });
@@ -52,6 +53,31 @@ export async function getBlock(seq: number) {
     } else {
         return null;
     }
+}
+
+export async function applyAccounts(accounts: { address: string }[]) {
+
+    // Insert new
+    await addressCollection.bulkWrite(accounts.map((v) => ({
+        updateOne: {
+            filter: { _id: v.address },
+            update: {
+                $setOnInsert: { _id: v.address, ...v }
+            },
+            upsert: true
+        }
+    })));
+
+    // Update
+    await addressCollection.bulkWrite(accounts.map((v) => ({
+        updateOne: {
+            filter: { _id: v.address, syncSeqno: { $lt: (v as any).syncSeqno } },
+            update: {
+                $set: { _id: v.address, ...v }
+            },
+            upsert: false
+        }
+    })));
 }
 
 export async function applyTransactions(transactions: { address: Address, lt: string, hash: string, data: string }[]) {
@@ -108,6 +134,7 @@ export async function startStorage() {
     syncStates = db.collection('sync_state');
     blocksCollection = db.collection('blocks');
     transactionsCollection = db.collection('transactions');
+    addressCollection = db.collection('address');
 
     log('Connected');
 }
