@@ -1,6 +1,6 @@
 import express from 'express';
 import { getBlock, applyBlocks } from '../../storage/startStorage';
-import { fetchBlock, ingress } from '../../ton/ingress';
+import { fetchBlock, getClient, ingress } from '../../ton/ingress';
 import { warn } from "../../utils/log";
 
 export function handleGetBlock(): express.RequestHandler {
@@ -18,6 +18,19 @@ export function handleGetBlock(): express.RequestHandler {
                 return;
             }
 
+            // Check if seqno is valid
+            if (seqno <= 0) {
+                res.status(200).send({
+                    exist: false
+                });
+            }
+            const lastSeqno = (await getClient(ingress.clients).getMasterchainInfo()).latestSeqno;
+            if (seqno > lastSeqno) {
+                res.status(200).send({
+                    exist: false
+                });
+            }
+
             // Get from backend
             let fetched = await fetchBlock(seqno, [ingress.historical]);
 
@@ -27,7 +40,7 @@ export function handleGetBlock(): express.RequestHandler {
             // Return data
             res.status(200).send({
                 exist: true,
-                shards: storedBlock
+                shards: fetched
             });
         } catch (e) {
             warn(e);
