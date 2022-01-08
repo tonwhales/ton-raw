@@ -1,31 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ton-chain-deployment
+  name: ton-chain-worker-deployment
   labels:
-    app: ton-chain
+    app: ton-chain-worker
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: ton-chain
+      app: ton-chain-worker
   template:
     metadata:
       labels:
-        app: ton-chain
+        app: ton-chain-worker
     spec:
       containers:
-        - name: ton-chain
+        - name: ton-chain-worker
           image: <image>
           env:
-            - name: PORT
-              value: "3000"
             - name: ROLE
-              value: api              
+              value: worker
             - name: TON_HISTORICAL
               value: https://scalable-api.tonwhales.com/jsonRPC
             - name: TON_ENDPOINTS
               value: https://node-1.servers.tonwhales.com/jsonRPC,https://node-2.servers.tonwhales.com/jsonRPC
+            - name: 
             - name: STORAGE
               valueFrom:
                 secretKeyRef:
