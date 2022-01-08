@@ -43,6 +43,15 @@ export async function applyBlocks(blocks: { seq: number, data: any }[]) {
     })));
 }
 
+export async function getBlock(seq: number) {
+    let ex = await blocksCollection.findOne({ _id: seq });
+    if (ex) {
+        return ex.data;
+    } else {
+        return null;
+    }
+}
+
 export async function startStorage() {
     log('Connecting to MongoDB');
     await storage.connect();

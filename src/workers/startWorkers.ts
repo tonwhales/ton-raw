@@ -1,7 +1,7 @@
 import { delay } from "teslabot";
 import { TonClient } from "ton";
 import { applyBlocks, getSyncState, setSyncState, storage } from "../storage/startStorage";
-import { getBlock, getClient, ingress } from "../ton/ingress";
+import { fetchBlock, getClient, ingress } from "../ton/ingress";
 import { backoff } from "../utils/time";
 
 export async function startBlocksWorker(syncKey: string) {
@@ -41,7 +41,7 @@ export async function startBlocksWorker(syncKey: string) {
                 }
 
                 // Fetch shards
-                return getBlock(seqno, clients);
+                return fetchBlock(seqno, clients);
             })));
             console.log(blocks.length + ' fetched in ' + (Date.now() - start) + ' ms');
 

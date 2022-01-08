@@ -19,7 +19,7 @@ export function getClient(clients: TonClient[]) {
     return clients[Math.floor(Math.random() * clients.length)];
 }
 
-export async function getBlock(seqno: number, clients: TonClient[]) {
+export async function fetchBlock(seqno: number, clients: TonClient[]) {
     let shardDefs = await backoff(() => getClient(clients).getWorkchainShards(seqno));
     shardDefs = [{ workchain: -1, seqno, shard: '-9223372036854775808' }, ...shardDefs];
 

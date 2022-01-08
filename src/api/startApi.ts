@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import { log } from '../utils/log';
 import { handleGetAccount } from './handlers/handleGetAccount';
+import { handleGetBlock } from './handlers/handleGetBlock';
 import { handleGetBlockLatest } from './handlers/handleGetBlockLatest';
 export async function startApi() {
 
@@ -16,6 +17,7 @@ export async function startApi() {
     // Handlers
     app.get('/address/:address', handleGetAccount());
     app.get('/block/latest', handleGetBlockLatest());
+    app.get('/block/:seqno', handleGetBlock());
 
     // Start
     const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
