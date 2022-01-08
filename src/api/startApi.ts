@@ -4,6 +4,7 @@ import { log } from '../utils/log';
 import { handleGetAccount } from './handlers/handleGetAccount';
 import { handleGetBlock } from './handlers/handleGetBlock';
 import { handleGetBlockLatest } from './handlers/handleGetBlockLatest';
+import { handleGetStatus } from './handlers/handleGetStatus';
 export async function startApi() {
 
     // Configure
@@ -18,6 +19,7 @@ export async function startApi() {
     app.get('/address/:address', handleGetAccount());
     app.get('/block/latest', handleGetBlockLatest());
     app.get('/block/:seqno', handleGetBlock());
+    app.get('/status', handleGetStatus());
 
     // Start
     const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
