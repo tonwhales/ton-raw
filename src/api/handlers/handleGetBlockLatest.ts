@@ -11,7 +11,7 @@ export function handleGetBlockLatest(): express.RequestHandler {
                 return;
             }
             res.status(200)
-                .set('Cache-Control', 'public, max-age=5')
+                .set('Cache-Control', 'public, must-revalidate, max-age=5')
                 .send({
                     seqno: parseInt(state, 10)
                 });
