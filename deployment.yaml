@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ton-chain-deployment
+  labels:
+    app: ton-chain
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ton-chain
+  template:
+    metadata:
+      labels:
+        app: ton-chain
+    spec:
+      containers:
+        - name: ton-chain
+          image: image:v2
+          env:
+            - name: PORT
+              value: 3000
+          ports:
+            - containerPort: 3000
