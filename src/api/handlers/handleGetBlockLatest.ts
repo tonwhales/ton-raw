@@ -10,9 +10,11 @@ export function handleGetBlockLatest(): express.RequestHandler {
                 res.status(500).send('500 Internal Error');
                 return;
             }
-            res.status(200).send({
-                seqno: parseInt(state, 10)
-            });
+            res.status(200)
+                .set('Cache-Control', 'public, max-age=5')
+                .send({
+                    seqno: parseInt(state, 10)
+                });
         } catch (e) {
             warn(e);
             res.status(500).send('500 Internal Error');
