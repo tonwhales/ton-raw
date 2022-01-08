@@ -22,5 +22,5 @@ spec:
               value: "3000"
           ports:
             - containerPort: 3000
-          imagePullSecrets:
-            - name: regcred
+      imagePullSecrets:
+        - name: regcred
