@@ -20,6 +20,15 @@ spec:
           env:
             - name: PORT
               value: "3000"
+            - name: TON_HISTORICAL
+              value: https://scalable-api.tonwhales.com/jsonRPC
+            - name: TON_ENDPOINTS
+              value: https://node-1.servers.tonwhales.com/jsonRPC,https://node-2.servers.tonwhales.com/jsonRPC
+            - name: STORAGE
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-cluster
+                  key: connection
           ports:
             - containerPort: 3000
       imagePullSecrets:

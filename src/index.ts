@@ -1,5 +1,9 @@
+require('dotenv').config();
+
 import { startApi } from "./api/startApi";
+import { startStorage } from "./storage/startStorage";
 
 (async () => {
-    startApi();
+    await startStorage();
+    await startApi();
 })();
