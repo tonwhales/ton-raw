@@ -49,8 +49,8 @@ export async function fetchBlock(seqno: number, clients: TonClient[]) {
     return shards;
 }
 
-export async function fetchAccountState(address: Address) {
-    let rawState = await getClient(ingress.clients).getContractState(address);
+export async function fetchAccountState(address: Address, clients: TonClient[]) {
+    let rawState = await getClient(clients).getContractState(address);
     return ({
         address: address.toFriendly(),
         balance: rawState.balance.toString(10),

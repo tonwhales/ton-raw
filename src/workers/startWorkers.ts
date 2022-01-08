@@ -56,7 +56,7 @@ export async function startBlocksWorker(syncKey: string) {
             }
             console.log('Unique accounts: ' + accounts.size);
             start = Date.now();
-            let states = await Promise.all(Array.from(accounts).map((src) => backoff(() => fetchAccountState(Address.parse(src[0])))));
+            let states = await Promise.all(Array.from(accounts).map((src) => backoff(() => fetchAccountState(Address.parse(src[0]), [ingress.historical]))));
             console.log('Accounts ' + states.length + ' fetched in ' + (Date.now() - start) + ' ms');
 
             // Persist accounts
