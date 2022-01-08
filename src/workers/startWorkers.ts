@@ -56,7 +56,13 @@ export async function startBlocksWorker(syncKey: string) {
             }
             console.log('Unique accounts: ' + accounts.size);
             start = Date.now();
-            let states = await Promise.all(Array.from(accounts).map((src) => backoff(() => fetchAccountState(Address.parse(src[0]), [ingress.historical]))));
+            let states = await Promise.all(Array.from(accounts).map((src) => backoff(async () => {
+                let d = await fetchAccountState(Address.parse(src[0]), [ingress.historical]);
+                if (d.syncSeqno < src[1]) {
+                    throw Error('Too old account state');
+                }
+                return d;
+            })));
             console.log('Accounts ' + states.length + ' fetched in ' + (Date.now() - start) + ' ms');
 
             // Persist accounts
