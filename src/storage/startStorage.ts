@@ -83,7 +83,7 @@ export async function applyAccounts(accounts: {
     // Update
     await addressCollection.bulkWrite(accounts.map((v) => ({
         updateOne: {
-            filter: { _id: v.address, syncSeqno: { $lt: (v as any).syncSeqno } },
+            filter: { _id: v.address, syncSeqno: { $lt: v.syncSeqno } },
             update: {
                 $set: { _id: v.address, ...v }
             },
