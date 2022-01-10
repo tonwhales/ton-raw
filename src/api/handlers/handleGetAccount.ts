@@ -13,29 +13,29 @@ export function handleGetAccount(): express.RequestHandler {
             const address = Address.parse(req.params.address);
 
             // Storage
-            let ex = await getAccount(address);
-            if (ex) {
-                res.status(200)
-                    .set('Cache-Control', 'public, max-age=5')
-                    .send({
-                        address: address.toFriendly(),
-                        balance: ex.balance,
-                        state: ex.state,
-                        code: ex.code,
-                        data: ex.data,
-                        lastTransaction: ex.lastTransaction ? {
-                            lt: ex.lastTransaction.lt,
-                            hash: ex.lastTransaction.hash
-                        } : null,
-                        timestamp: ex.timestamp
-                    });
+            // let ex = await getAccount(address);
+            // if (ex) {
+            //     res.status(200)
+            //         .set('Cache-Control', 'public, max-age=5')
+            //         .send({
+            //             address: address.toFriendly(),
+            //             balance: ex.balance,
+            //             state: ex.state,
+            //             code: ex.code,
+            //             data: ex.data,
+            //             lastTransaction: ex.lastTransaction ? {
+            //                 lt: ex.lastTransaction.lt,
+            //                 hash: ex.lastTransaction.hash
+            //             } : null,
+            //             timestamp: ex.timestamp
+            //         });
 
-                return;
-            }
+            //     return;
+            // }
 
             // Fetch state
             let rawState = await backoff(async () => {
-                return fetchAccountState(address, [ingress.historical]);
+                return fetchAccountState(address, ingress.clients);
             });
 
             // Persist state
