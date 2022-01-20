@@ -46,29 +46,29 @@ export async function startBlocksWorker(syncKey: string) {
             console.log(blocks.length + ' fetched in ' + (Date.now() - start) + ' ms');
 
             // Fetching accounts
-            let accounts = new Map<string, number>();
-            for (let b of blocks) {
-                for (let sh of b) {
-                    for (let t of sh.transactions) {
-                        accounts.set(t.address, Math.max((accounts.get(t.address) || b[0].seqno), b[0].seqno));
-                    }
-                }
-            }
-            console.log('Unique accounts: ' + accounts.size);
-            start = Date.now();
-            let states = await Promise.all(Array.from(accounts).map((src) => backoff(async () => {
-                let d = await fetchAccountState(Address.parse(src[0]), ingress.clients);
-                if (d.syncSeqno < src[1]) {
-                    throw Error('Too old account state');
-                }
-                return d;
-            })));
-            console.log('Accounts ' + states.length + ' fetched in ' + (Date.now() - start) + ' ms');
+            // let accounts = new Map<string, number>();
+            // for (let b of blocks) {
+            //     for (let sh of b) {
+            //         for (let t of sh.transactions) {
+            //             accounts.set(t.address, Math.max((accounts.get(t.address) || b[0].seqno), b[0].seqno));
+            //         }
+            //     }
+            // }
+            // console.log('Unique accounts: ' + accounts.size);
+            // start = Date.now();
+            // let states = await Promise.all(Array.from(accounts).map((src) => backoff(async () => {
+            //     let d = await fetchAccountState(Address.parse(src[0]), ingress.clients);
+            //     if (d.syncSeqno < src[1]) {
+            //         throw Error('Too old account state');
+            //     }
+            //     return d;
+            // })));
+            // console.log('Accounts ' + states.length + ' fetched in ' + (Date.now() - start) + ' ms');
 
             // Persist accounts
-            start = Date.now();
-            await applyAccounts(states);
-            console.log('Accounts ' + states.length + ' written in ' + (Date.now() - start) + ' ms');
+            // start = Date.now();
+            // await applyAccounts(states);
+            // console.log('Accounts ' + states.length + ' written in ' + (Date.now() - start) + ' ms');
 
             // Persisting blocks
             start = Date.now();
