@@ -27,7 +27,7 @@ export async function startBlocksWorker(syncKey: string, large: boolean) {
             // Fetching blocks
             let start = Date.now();
             let seqs: number[] = [];
-            for (let i = 0; i + lastSeq + 1 <= lastSeqno && i < (large ? 5000 : 100); i++) {
+            for (let i = 0; i + lastSeq + 1 <= lastSeqno && i < (large ? 1000 : 100); i++) {
                 seqs.push(lastSeq + i + 1);
             }
             const blocks = await Promise.all(seqs.map((seqno) => backoff(async () => {
@@ -73,7 +73,7 @@ export async function startBlocksWorker(syncKey: string, large: boolean) {
             // Persisting blocks
             start = Date.now();
             await backoff(async () => {
-                applyBlocks(blocks.map((b) => ({ seq: b[0].seqno/* First is always masterchain one */, data: b })))
+                await applyBlocks(blocks.map((b) => ({ seq: b[0].seqno/* First is always masterchain one */, data: b })))
             });
             console.log(blocks.length + ' written in ' + (Date.now() - start) + ' ms');
 
