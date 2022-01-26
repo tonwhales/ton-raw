@@ -27,7 +27,7 @@ export async function startBlocksWorker(syncKey: string, large: boolean) {
             // Fetching blocks
             let start = Date.now();
             let seqs: number[] = [];
-            for (let i = 0; i + lastSeq + 1 <= lastSeqno && i < (large ? 1000 : 100); i++) {
+            for (let i = 0; i + lastSeq + 1 <= lastSeqno && i < (large ? 100 : 10); i++) {
                 seqs.push(lastSeq + i + 1);
             }
             const blocks = await Promise.all(seqs.map((seqno) => backoff(async () => {
