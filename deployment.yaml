@@ -23,7 +23,7 @@ spec:
             - name: ROLE
               value: api              
             - name: TON_HISTORICAL
-              value: https://scalable-api.tonwhales.com/jsonRPC
+              value: https://mainnet.tonhubapi.com/jsonRPC
             - name: TON_ENDPOINTS
               value: https://node-1.servers.tonwhales.com/jsonRPC,https://node-2.servers.tonwhales.com/jsonRPC
             - name: STORAGE
