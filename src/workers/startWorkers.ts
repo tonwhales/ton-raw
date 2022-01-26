@@ -4,7 +4,7 @@ import { applyAccounts, applyBlocks, getSyncState, setSyncState, storage } from 
 import { fetchAccountState, fetchBlock, getClient, ingress } from "../ton/ingress";
 import { backoff } from "../utils/time";
 
-export async function startBlocksWorker(syncKey: string) {
+export async function startBlocksWorker(syncKey: string, large: boolean) {
     backoff(async () => {
         while (true) {
 
@@ -27,7 +27,7 @@ export async function startBlocksWorker(syncKey: string) {
             // Fetching blocks
             let start = Date.now();
             let seqs: number[] = [];
-            for (let i = 0; i + lastSeq + 1 <= lastSeqno && i < 100; i++) {
+            for (let i = 0; i + lastSeq + 1 <= lastSeqno && i < (large ? 5000 : 100); i++) {
                 seqs.push(lastSeq + i + 1);
             }
             const blocks = await Promise.all(seqs.map((seqno) => backoff(async () => {
@@ -87,6 +87,6 @@ export async function startBlocksWorker(syncKey: string) {
 }
 
 export async function startWorkers() {
-    startBlocksWorker('blocks_historic');
-    startBlocksWorker('blocks_fresh');
+    startBlocksWorker('blocks_historic', true);
+    startBlocksWorker('blocks_fresh', false);
 }
