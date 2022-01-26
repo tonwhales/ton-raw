@@ -2,9 +2,8 @@ import express from 'express';
 import { warn } from "../../utils/log";
 import { Address } from "ton";
 import { backoff } from "../../utils/time";
-import { fetchAccountState, getClient, ingress } from "../../ton/ingress";
-import { applyAccounts, getAccount } from '../../storage/startStorage';
-import { extractInterfaces } from '../../ton/extractInterfaces';
+import { fetchAccountState, ingress } from "../../ton/ingress";
+import { applyAccounts } from '../../storage/startStorage';
 
 export function handleGetAccount(): express.RequestHandler {
     return async (req, res) => {
@@ -42,12 +41,6 @@ export function handleGetAccount(): express.RequestHandler {
             // Persist state
             await applyAccounts([rawState]);
 
-            // Process
-            let supportedInterfaces: number[] = [];
-            if (rawState.code && rawState.data && address.workChain === 0) {
-                supportedInterfaces = await extractInterfaces(Buffer.from(rawState.code, 'base64'), Buffer.from(rawState.data, 'base64'));
-            }
-
             // Result
             res.status(200)
                 .set('Cache-Control', 'public, max-age=5')
@@ -57,9 +50,6 @@ export function handleGetAccount(): express.RequestHandler {
                     state: rawState.state,
                     code: rawState.code,
                     data: rawState.data,
-                    meta: {
-                        supportedInterfaces
-                    },
                     lastTransaction: rawState.lastTransaction ? {
                         lt: rawState.lastTransaction.lt,
                         hash: rawState.lastTransaction.hash
