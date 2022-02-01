@@ -33,12 +33,12 @@ export async function startBlocksWorker(syncKey: string, large: boolean) {
             const blocks = await Promise.all(seqs.map((seqno) => backoff(async () => {
 
                 // Pick better client collection
-                let clients: TonClient[];
-                if (lastSeqno - seqno < 10000) {
-                    clients = ingress.clients; // For last 10k blocks - fetch contemporary
-                } else {
-                    clients = [ingress.historical];
-                }
+                let clients: TonClient[] = [ingress.historical];
+                // if (lastSeqno - seqno < 10000) {
+                //     clients = ingress.clients; // For last 10k blocks - fetch contemporary
+                // } else {
+                //     clients = [ingress.historical];
+                // }
 
                 // Fetch shards
                 return fetchBlock(seqno, clients);
