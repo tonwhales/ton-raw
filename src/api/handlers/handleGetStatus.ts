@@ -15,7 +15,11 @@ export function handleGetStatus(): express.RequestHandler {
                 });
         } catch (e) {
             warn(e);
-            res.status(500).send('500 Internal Error');
+            try {
+                res.status(500).send('500 Internal Error');
+            } catch (e) {
+                warn(e);
+            }
         }
     };
 }
