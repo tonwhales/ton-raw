@@ -30,7 +30,7 @@ export function handleGetBlock(): express.RequestHandler {
             }
 
             // Check if seqno is valid
-            const lastSeqno = (await getClient(ingress.clients).getMasterchainInfo()).latestSeqno;
+            const lastSeqno = (await ingress.historical.getMasterchainInfo()).latestSeqno;
             if (seqno > lastSeqno) {
                 res.status(200)
                     .set('Cache-Control', 'public, max-age=5')

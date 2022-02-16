@@ -18,7 +18,7 @@ export async function startBlocksWorker(syncKey: string, large: boolean) {
             }
 
             // Check if reached end
-            const lastSeqno = (await backoff(() => getClient(ingress.clients).getMasterchainInfo())).latestSeqno;
+            const lastSeqno = (await backoff(() => ingress.historical.getMasterchainInfo())).latestSeqno;
             if (lastSeqno <= lastSeq) {
                 await delay(1000);
                 continue;

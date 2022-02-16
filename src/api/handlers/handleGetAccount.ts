@@ -35,7 +35,7 @@ export function handleGetAccount(): express.RequestHandler {
 
             // Fetch state
             let rawState = await backoff(async () => {
-                return fetchAccountState(address, ingress.clients);
+                return fetchAccountState(address, [ingress.historical]);
             });
 
             // Persist state

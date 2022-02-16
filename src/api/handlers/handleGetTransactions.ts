@@ -40,7 +40,7 @@ export function handleGetTransactions(): express.RequestHandler {
             }
 
             // Fetch from generic clients
-            let client = getClient(ingress.clients);
+            let client = ingress.historical;
             let txs = await client.getTransactions(address, { limit, lt, hash, inclusive: true });
             if (txs.length > 0) {
                 await applyTransactions(txs.map((v) => ({ address: address, lt: v.id.lt, hash: v.id.hash, data: v.data })));
