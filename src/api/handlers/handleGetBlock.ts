@@ -1,6 +1,6 @@
 import express from 'express';
 import { getBlock, applyBlocks } from '../../storage/startStorage';
-import { fetchBlock, getClient, ingress } from '../../ton/ingress';
+import { fetchBlock, client } from '../../ton/ingress';
 import { warn } from "../../utils/log";
 
 export function handleGetBlock(): express.RequestHandler {
@@ -30,7 +30,7 @@ export function handleGetBlock(): express.RequestHandler {
             }
 
             // Check if seqno is valid
-            const lastSeqno = (await ingress.historical.getMasterchainInfo()).latestSeqno;
+            const lastSeqno = (await client.getMasterchainInfo()).latestSeqno;
             if (seqno > lastSeqno) {
                 res.status(200)
                     .set('Cache-Control', 'public, max-age=5')
@@ -40,7 +40,7 @@ export function handleGetBlock(): express.RequestHandler {
             }
 
             // Get from backend
-            let fetched = await fetchBlock(seqno, [ingress.historical]);
+            let fetched = await fetchBlock(seqno);
 
             // Apply to cache
             await applyBlocks([{ seq: fetched[0].seqno, data: fetched }]);

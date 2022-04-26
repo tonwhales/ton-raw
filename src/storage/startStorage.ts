@@ -2,8 +2,14 @@ import { BN } from "bn.js";
 import { MongoClient, Db, Collection } from "mongodb";
 import { Address, Cell, parseTransaction } from "ton";
 import { log } from "../utils/log";
+import path from 'path';
+import fs from 'fs';
 
-export const storage = new MongoClient(process.env.STORAGE!);
+let mongoCertPath = path.resolve("./ca-certificate.crt");
+if (process.env.CA_CERT) {
+    fs.writeFileSync(mongoCertPath, process.env.CA_CERT);
+}
+export const storage = new MongoClient(process.env.STORAGE!, process.env.NODE_ENV === 'production' ? { sslCA: mongoCertPath } : undefined)
 
 let db: Db;
 let syncStates: Collection;
