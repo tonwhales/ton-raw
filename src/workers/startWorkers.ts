@@ -51,6 +51,6 @@ export async function startBlocksWorker(syncKey: string, large: boolean) {
 }
 
 export async function startWorkers() {
-    startBlocksWorker('blocks_historic', true);
-    startBlocksWorker('blocks_fresh', false);
+    startBlocksWorker('blocks_simple', true);
+    // startBlocksWorker('blocks_fresh', false);
 }
