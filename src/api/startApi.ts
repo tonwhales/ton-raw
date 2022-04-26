@@ -1,7 +1,6 @@
 import cors from 'cors';
 import express from 'express';
 import { log } from '../utils/log';
-import { handleGetAccount } from './handlers/handleGetAccount';
 import { handleGetBlock } from './handlers/handleGetBlock';
 import { handleGetBlockLatest } from './handlers/handleGetBlockLatest';
 import { handleGetStatus } from './handlers/handleGetStatus';
@@ -17,7 +16,6 @@ export async function startApi() {
     });
 
     // Handlers
-    app.get('/address/:address', handleGetAccount());
     app.get('/block/latest', handleGetBlockLatest());
     app.get('/block/:seqno', handleGetBlock());
     app.get('/tx/:address', handleGetTransactions());
