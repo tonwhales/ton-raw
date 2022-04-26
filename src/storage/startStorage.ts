@@ -9,7 +9,7 @@ let mongoCertPath = path.resolve("./ca-certificate.crt");
 if (process.env.CA_CERT) {
     fs.writeFileSync(mongoCertPath, process.env.CA_CERT);
 }
-export const storage = new MongoClient(process.env.STORAGE!, process.env.NODE_ENV === 'production' ? { sslCA: mongoCertPath } : undefined)
+export const storage = new MongoClient(process.env.STORAGE!, process.env.NODE_ENV === 'production' ? { sslCA: mongoCertPath, sslValidate: false } : undefined)
 
 let db: Db;
 let syncStates: Collection;
